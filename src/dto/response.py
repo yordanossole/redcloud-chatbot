@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Union
 
 class ApiResponse(BaseModel):
     message: Optional[str] = ""
-    data: Optional[dict] = None
+    data: Union[dict, str, None] = None
