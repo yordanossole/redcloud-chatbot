@@ -13,3 +13,4 @@ app.add_middleware(
 )
 
 app.include_router(user_route.router, prefix="/api")
+app.include_router(user_route.router, prefix="/api/chat")
