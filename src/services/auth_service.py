@@ -29,8 +29,8 @@ def create_session_token(db: Session, username: str):
 
     return token
 
-def validate_session_token(username: str, token: str):
-    user = get_user(db = Depends(get_db), username = username)
+def validate_session_token(db: Session, username: str, token: str):
+    user = get_user(db = db, username = username)
 
     if not user:
         return False
