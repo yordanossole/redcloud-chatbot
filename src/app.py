@@ -12,5 +12,5 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(user_route.router, prefix="/api")
+app.include_router(user_route.router, prefix="/api/user")
 app.include_router(chat_route.router, prefix="/api/chat")

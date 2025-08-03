@@ -38,10 +38,10 @@ async def sign_in(create_user_request: CreateUserRequest, db: Session = Depends(
 @router.post("/logout")
 async def logout(request: Request, db: Session = Depends(get_db)):
     try:
-        token = str(request.cookies.get("session_token", "No token"))
-        print(f"\n\n\n\n\n{token}\n\n\n\n------")
+        token = str(request.cookies.get("session_token"))
+        if not token:
+            return JSONResponse(status_code=401, content=ApiResponse(message="Not authenticated", data={}).model_dump())
         user = delete_session(db=db, session_token=token)
-        # response.delete_cookie("session_token")
         api_response = ApiResponse(message=f"{user.username} logged out successfully", data={})
 
         response = JSONResponse(status_code=200, content=api_response.model_dump())
