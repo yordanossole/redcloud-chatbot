@@ -7,8 +7,6 @@ from ..database.models import get_db
 from ..dto.request import CreateUserRequest
 from ..dto.response import ApiResponse
 from ..custom_exceptions import GeneralException
-
-
 router = APIRouter()
 
 @router.post('/login')
