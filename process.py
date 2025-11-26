@@ -1,0 +1,2 @@
+from src.services.chat_service import build_and_save_index
+build_and_save_index()
