@@ -14,4 +14,4 @@ app.add_middleware(
 
 app.include_router(user_route.router, prefix="/api/user")
 app.include_router(chat_route.router, prefix="/api/chat")
-app.include_router(file_route.router, prefix="/api/files")
+# app.include_router(file_route.router, prefix="/api/files")
