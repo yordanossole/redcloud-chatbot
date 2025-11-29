@@ -11,9 +11,10 @@ import faiss
 import numpy as np
 import pickle
 
-pdf_folder = "../docs"
-faiss_index_file = os.path.join(os.path.dirname(__file__), "../docs/faiss_index.bin")
-docs_pickle_file = os.path.join(os.path.dirname(__file__), "../docs/docs.pkl")
+_BASE_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+pdf_folder = os.path.join(_BASE_DIR, "docs")
+faiss_index_file = os.path.join(_BASE_DIR, "docs", "faiss_index.bin")
+docs_pickle_file = os.path.join(_BASE_DIR, "docs", "docs.pkl")
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
@@ -61,6 +62,7 @@ def search(query, index, docs, k=2):
 def generate_response_service(db: Session, question: str, chat: Chat, messages_schema: list):
     chat_bot = client.chats.create(model=GEMINI_API_MODEL, history=messages_schema)
 
+    # This retrieves the document that has relation to the question
     index, docs = load_index_and_docs()
     context, distances = search(question, index, docs, k=2)[0]
     # if distances[0][0] > 0.6:
@@ -68,8 +70,27 @@ def generate_response_service(db: Session, question: str, chat: Chat, messages_s
     
     context = context["text"]
 
-    prompt = f"Use this context: {context} and answer my question: {question}."
+    prompt = f"""
+                You are an expert customer-support agent for CNET ERP. 
+                Your ONLY job is to answer user questions using the retrieved knowledge below.
 
+                RULES — never break these:
+                1. Stay 100% on-topic. Do NOT engage in chit-chat, opinions, jokes, or external topics.
+                2. Answer ONLY from the retrieved context. If the context does not contain the answer, say exactly:
+                "I don't have that information in my knowledge base. Please contact human support at admin@hulubeje.com or check our help center at https://www.redcloud.com.et"
+                3. Be concise: maximum 3–4 sentences unless a step-by-step guide is required.
+                4. Use markdown (bullet points, code blocks, bold) for clarity.
+                5. If citing a document, add the source title in brackets at the end, e.g. [Billing FAQ v2025].
+                6. Never hallucinate features, prices, dates, or policies.
+                7. Never ask follow-up questions unless absolutely required to solve the issue (e.g., need more error details).
+
+                Retrieved context (use only this):
+                {context}
+
+                User question: {question}
+
+                Answer now."""
+    
     response = chat_bot.send_message(prompt) 
     content = str(response.text)
 
